@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    stream:
+      bindings:
+        notification-input-channel:
+          destination: pos-topic
+        notification-output-channel:
+          destination: loyalty-topic
+        hadoop-input-channel:
+          destination: pos-topic
+        hadoop-output-channel:
+          destination: hadoop-sink-topic
+      kafka:
+        streams:
+          binder:
+            brokers: localhost:9092
+
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

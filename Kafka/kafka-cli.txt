@@ -1,0 +1,56 @@
+----------------------------------------------------------------------------------
+topics
+----------------------------------------------------------------------------------
+
+./kafka-topics.sh --create --topic test-topic --replication-factor 1 --partitions 3 --bootstrap-server localhost:9092
+
+./kafka-topics.sh --list --bootstrap-server localhost:9092
+
+./kafka-topics.sh --topic first-topic --describe --bootstrap-server localhost:9092`
+
+/kafka-topics.sh --topic first-topic --delete --bootstrap-server localhost:9092
+
+----------------------------------------------------------------------------------
+console-producer
+----------------------------------------------------------------------------------
+
+./kafka-console-producer.sh --broker-list localhost:9092 --topic first-topic
+
+./kafka-console-producer.sh --broker-list localhost:9092 --topic first-topic --producer-property acks=all
+
+`./kafka-console-producer.sh --broker-list localhost:9092 --topic second-topic
+
+
+----------------------------------------------------------------------------------
+console-consumer
+----------------------------------------------------------------------------------
+
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first-topic
+
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first-topic --from-beginning
+
+----------------------------------------------------------------------------------
+consumer-group
+----------------------------------------------------------------------------------
+
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first-topic --group group1
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first-topic --group group1 --fromBegining
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first-topic --group group2
+
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group group1
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group group2
+
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic first-topic --group group1
+
+
+
+----------------------------------------------------------------------------------
+Resetting Offsets
+----------------------------------------------------------------------------------
+
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group group1 --reset-offsets --to-earliest --execute --topic first-topic
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group group1 --shift-by -2 --topic first-topic
+
+
