@@ -1,0 +1,20 @@
+<div class="container">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Release Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each movies}}
+            <tr>
+                <td>{{this.title}}</td>
+                <td>{{this.released}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+</div>

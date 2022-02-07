@@ -1,0 +1,15 @@
+{
+  "name": "node-async-code",
+  "version": "1.0.0",
+  "description": "https://www.digitalocean.com/community/tutorials/how-to-write-asynchronous-code-in-node-js",
+  "main": "async-await.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.2.2",
+    "request": "^2.88.2"
+  }
+}

@@ -1,0 +1,15 @@
+
+
+How to implement Async Programming in javascript ?
+
+way-1 : promise api ( es6 )
+
+        limitation(s)
+
+        => can resolve/reject one-time
+        => eager call
+
+way-2 : rxjs
+
+        
+

@@ -1,0 +1,11 @@
+
+------------------------------------------------------------------------------------
+
+-> Officially, Redis can be compiled and used on Linux, OS X, OpenBSD, NetBSD, and FreeBSD.
+
+->  https://github.com/MSOpenTech/redis
+
+->  as docker container any platform
+
+
+------------------------------------------------------------------------------------

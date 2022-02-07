@@ -1,0 +1,56 @@
+
+
+- Lists are a very flexible data type in Redis because they can act like a simple collection, stack, or queue.
+- Redis's Lists are linked lists, therefore insertions and deletions from the beginning or the end of a List run in O(1), constant time.
+- The task of accessing an element in a List runs in O(N), linear time, 
+  but accessing the first or last element always runs in constant time.
+- The maximum number of elements a List can hold is 
+  
+  list-max-ziplist-entries
+
+
+
+Some real-world use cases of Lists are as follows:
+
+
+ - Event queue: Lists are used in many tools, including Resque, Celery, and Logstash
+ - Storing most recent user posts: Twitter does this by storing the latest tweets of a user in a List
+
+
+ -------------------------------------------------------------------------------------------------
+
+ $ redis-cli
+127.0.0.1:6379> LPUSH books "Clean Code"
+(integer) 1
+127.0.0.1:6379> RPUSH books "Code Complete"
+(integer) 2
+127.0.0.1:6379> LPUSH books "Peopleware"
+(integer) 3
+
+
+$ redis-cli
+127.0.0.1:6379> LLEN books
+(integer) 3
+127.0.0.1:6379> LINDEX books 1
+"Clean Code"
+
+
+$ redis-cli
+127.0.0.1:6379> LRANGE books 0 1
+1) "Peopleware"
+2) "Clean Code"
+127.0.0.1:6379> LRANGE books 0 -1
+1) "Peopleware"
+2) "Clean Code"
+3) "Code Complete"
+
+
+$ redis-cli
+127.0.0.1:6379> LPOP books
+"Peopleware"
+127.0.0.1:6379> RPOP books
+"Code Complete"
+127.0.0.1:6379> LRANGE books 0 -1
+1) "Clean Code"
+
+

@@ -1,0 +1,38 @@
+
+
+- Hashes are a great data structure for storing objects because you can map fields to values
+- They are optimized to use memory efficiently and look for data very fast.
+- In a Hash, both the field name and the value are Strings. 
+  Therefore, a Hash is a mapping of a String to a String.
+
+
+  http://instagram-engineering.tumblr.com/post/12202313862/storing-hundreds-of-millions-of-simple-key-value.
+
+
+
+$ redis-cli
+127.0.0.1:6379> HSET movie "title" "The Godfather"
+(integer) 1
+127.0.0.1:6379> HMSET movie "year" 1972 "rating" 9.2 "watchers" 10000000
+OK
+127.0.0.1:6379> HINCRBY movie "watchers" 3
+(integer) 10000003
+
+127.0.0.1:6379> HGET movie "title"
+"The Godfather"
+127.0.0.1:6379> HMGET movie "title" "watchers"
+1) "The Godfather"
+2) "10000003"
+
+127.0.0.1:6379> HDEL movie "watchers"
+(integer) 1
+
+
+127.0.0.1:6379> HGETALL movie
+1) "title"
+2) "The Godfather"
+3) "year"
+4) "1972"
+5) "rating"
+6) "9.2"
+127.0.0.1:6379>

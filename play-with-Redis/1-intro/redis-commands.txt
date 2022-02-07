@@ -1,0 +1,457 @@
+
+------------------------------------------------------
+
+https://redis.io/
+
+
+------------------------------------------------------
+
+When to use Redis in your application
+
+- Session store / Database
+- Analytics
+- Leaderboards
+- Queues / Message broker
+- Latest N records
+- Caching
+
+
+-------------------------------------------------------
+Redis Data Types
+-------------------------------------------------------
+
+-------------------------------------------------------
+1- Using the string data type
+-------------------------------------------------------
+
+127.0.0.1:6379> SET "Extreme Pizza" "300 Broadway, New York, NY" 
+OK
+
+127.0.0.1:6379> GET "Extreme Pizza" 
+"300 Broadway, New York, NY" 
+
+127.0.0.1:6379> GET "Yummy Pizza" 
+(nil) 
+
+
+127.0.0.1:6379> STRLEN "Extreme Pizza"
+ (integer) 26
+
+
+127.0.0.1:6379> STRLEN "Yummy Pizza" 
+ (integer) 0
+
+127.0.0.1:6379> APPEND "Extreme Pizza" " 10011" 
+(integer) 32 
+
+127.0.0.1:6379> GET "Extreme Pizza" 
+"300 Broadway, New York, NY 10011"
+
+
+127.0.0.1:6379> SETRANGE "Extreme Pizza" 14 "Washington, DC 20009" 
+(integer) 34 
+127.0.0.1:6379> GET "Extreme Pizza" 
+"300 Broadway, Washington, DC 20009" 
+
+----------------------------------------
+
+
+SET <key> <value>.
+
+
+----------------------------------------
+
+127.0.0.1:6379> SETNX "Lobster Palace" "437 Main St, Chicago, IL" 
+(integer) 1 
+127.0.0.1:6379> SETNX "Extreme Pizza" "100 Broadway, New York, NY" 
+(integer) 0
+
+----------------------------------------
+
+
+MSET key value [key value...]
+MGET key value [key value...]
+
+127.0.0.1:6379> MSET "Sakura Sushi" "123 Ellis St, Chicago, IL" "Green Curry Thai" "456 American Way, Seattle, WA" 
+OK 
+
+127.0.0.1:6379> MGET "Sakura Sushi" "Green Curry Thai" "nonexistent" 
+1) "123 Ellis St, Chicago, IL" 
+2) "456 American Way, Seattle, WA" 
+3) (nil)
+
+
+
+-------------------------------------------------------
+2- Using the list data type   ( DOUBLE lINKED LIST )
+-------------------------------------------------------
+
+127.0.0.1:6379> LPUSH favorite_restaurants "PF Chang's" "Olive Garden"
+(integer) 2
+
+127.0.0.1:6379> LRANGE favorite_restaurants 0 -1
+1) "Olive Garden"
+2) "PF Chang's"
+
+127.0.0.1:6379> RPUSH favorite_restaurants "Outback Steakhouse" "Red Lobster"
+(integer) 4
+
+127.0.0.1:6379> LRANGE favorite_restaurants 0 -1
+1) "Olive Garden"
+2) "PF Chang's"
+3) "Outback Steakhouse"
+4) "Red Lobster"
+
+127.0.0.1:6379> LINSERT favorite_restaurants AFTER "PF Chang's" "Indian Tandoor"
+(integer) 5
+
+127.0.0.1:6379> LRANGE favorite_restaurants 0 -1
+1) "Olive Garden"
+2) "PF Chang's"
+3) "Indian Tandoor"
+4) "Outback Steakhouse"
+5) "Red Lobster"
+
+127.0.0.1:6379> LINDEX favorite_restaurants 3
+"Outback Steakhouse"
+
+
+127.0.0.1:6379> LPOP favorite_restaurants
+"Olive Garden"
+
+127.0.0.1:6379> RPOP favorite_restaurants
+"Red Lobster"
+
+127.0.0.1:6379> LPOP non_existent
+(nil)
+
+
+127.0.0.1:6379> LRANGE favorite_restaurants 0 -1
+1) "PF Chang's"
+2) "Indian Tandoor"
+3) "Outback Steakhouse"
+
+127.0.0.1:6379> LTRIM favorite_restaurants 1 -1
+OK
+127.0.0.1:6379> LRANGE favorite_restaurants 0 -1
+1) "Indian Tandoor"
+2) "Outback Steakhouse"
+
+
+127.0.0.1:6379> LSET favorite_restaurants 1 "Longhorn Steakhouse"
+OK
+
+127.0.0.1:6379> LRANGE favorite_restaurants 0 -1
+1) "Indian Tandoor"
+2) "Longhorn Steakhouse"
+
+
+--------------------------------------------------------------
+
+
+worker-1> BRPOP job_queue 0 
+worker-2> BRPOP job_queue 0
+
+dispatcher> LPUSH job_queue job1 
+(integer) 1
+
+worker-1> BRPOP job_queue 0 
+1) "job_queue" 
+2) "job1" 
+(170.81s)
+
+dispatcher> LPUSH job_queue job2 job3 
+
+worker-2> BRPOP job_queue 0 
+1) "job_queue" 
+2) "job2" 
+(358.12s)
+
+dispatcher> LRANGE job_queue 0 -1 
+1) "job3"
+
+
+--------------------------------------------------------------
+
+Using the hash data type ( HASH TABLE )
+
+--------------------------------------------------------------
+
+
+127.0.0.1:6379> HMSET "Kyoto Ramen" "address" "801 Mission St, San Jose, CA" "phone" "555-123-6543" "rating" "5.0" 
+OK
+
+127.0.0.1:6379> HMGET "Kyoto Ramen" "address" "phone" "rating" 
+1) "801 Mission St, San Jose, CA" 
+2) "555-123-6543" 
+3) "5.0"
+
+127.0.0.1:6379> HGET "Kyoto Ramen" "rating" 
+"5.0" 
+
+127.0.0.1:6379> HEXISTS "Kyoto Ramen" "phone" 
+(integer) 1 
+127.0.0.1:6379> HEXISTS "Kyoto Ramen" "hours" 
+(integer) 0
+
+127.0.0.1:6379> HGETALL "Kyoto Ramen" 
+1) "address" 
+2) "801 Mission St, San Jose, CA" 
+3) "phone" 
+4) "555-123-6543" 
+5) "rating" 
+6) "5.0" 
+
+
+127.0.0.1:6379> HSET "Kyoto Ramen" "rating" "4.9" 
+(integer) 0 
+127.0.0.1:6379> HSET "Kyoto Ramen" "status" "open" 
+(integer) 1 
+ 
+127.0.0.1:6379> HMGET "Kyoto Ramen" "rating" "status" 
+1) "4.9" 
+2) "open" 
+
+127.0.0.1:6379> HDEL "Kyoto Ramen" "address" "phone" 
+(integer) 2 
+127.0.0.1:6379> HGETALL "Kyoto Ramen" 
+1) "rating" 
+2) "4.9"
+
+
+127.0.0.1:6379> HSETNX "Kyoto Ramen" "phone" "555-555-0001" 
+(integer) 0 
+127.0.0.1:6379> HGET "Kyoto Ramen" "phone" 
+"555-123-6543"  
+
+127.0.0.1:6379> HMGET "Kyoto Ramen" "rating" "hours" 
+1) "4.9" 
+2) (nil) 
+ 
+127.0.0.1:6379> HGET "Little Sheep Mongolian" "address" 
+(nil)
+
+
+NOTE : The maximum number of fields that can be put in a hash is 2^32 -1.
+
+HSCAN key cursor [MATCH pattern] [COUNT number].
+
+127.0.0.1:6379> HSCAN restaurant_ratings 0 MATCH *garden* 
+1) "309" 
+2) 1) "panda garden" 
+   2) "3.9" 
+   3) "chang's garden" 
+   4) "4.5" 
+   5) "rice garden" 
+   6) "4.8"
+
+127.0.0.1:6379> HSCAN restaurant_ratings 309 MATCH *garden* 
+1) "0" 
+2) 1) "szechuwan garden" 
+   2) "4.9" 
+   3) "garden wok restaurant" 
+   4) "4.7" 
+   5) "win garden" 
+   6) "4.0" 
+   7) "east garden restaurant" 
+   8) "4.6"
+
+
+
+--------------------------------------------------------------
+
+Using the set data type
+
+--------------------------------------------------------------   
+
+
+The set data type is a collection of unique and unordered objects. 
+
+It is often used in applications for 
+membership testing, 
+duplicates removal, 
+and math operations (union, intersection, and difference).
+
+
+127.0.0.1:6379> SADD "Original Buffalo Wings" "affordable" "spicy" "busy" "great taste"
+(integer) 4
+
+127.0.0.1:6379> SISMEMBER "Original Buffalo Wings" "busy"
+(integer) 1
+127.0.0.1:6379> SISMEMBER "Original Buffalo Wings" "costly"
+(integer) 0
+
+127.0.0.1:6379> SREM "Original Buffalo Wings" "busy" "spicy"
+(integer) 2
+127.0.0.1:6379> SISMEMBER "Original Buffalo Wings" "busy"
+(integer) 0
+127.0.0.1:6379> SISMEMBER "Original Buffalo Wings" "spicy"
+(integer) 0
+
+127.0.0.1:6379> SCARD "Original Buffalo Wings" 
+(integer) 2 
+
+
+127.0.0.1:6379> SMEMBERS "Original Buffalo Wings" 
+1) "affordable" 
+2) "great taste" 
+127.0.0.1:6379> SADD "Big Bear Wings" "affordable" "spacious" "great music" 
+(integer) 3 
+
+127.0.0.1:6379> SINTER "Original Buffalo Wings" "Big Bear Wings" 
+1) "affordable" 
+ 
+127.0.0.1:6379> SINTERSTORE "common_tags" "Original Buffalo Wings" "Big Bear Wings" 
+(integer) 1 
+
+127.0.0.1:6379> SMEMBERS "common_tags" 
+1) "affordable"
+
+
+---------------------------------------------------------------------------------
+Using the sorted set data type
+---------------------------------------------------------------------------------
+
+
+127.0.0.1:6379> ZADD ranking:restaurants 100 "Olive Garden" 23 "PF Chang's" 34 "Outback Steakhouse" 45 "Red Lobster" 88 "Longhorn Steakhouse"
+ (integer) 5
+
+127.0.0.1:6379> ZREVRANGE ranking:restaurants 0 -1 WITHSCORES 
+1) "Olive Garden" 
+2) "100" 
+3) "Longhorn Steakhouse" 
+4) "88" 
+5) "Red Lobster" 
+6) "45" 
+7) "Outback Steakhouse" 
+8) "34" 
+9) "PF Chang's" 
+10) "23" 
+
+
+127.0.0.1:6379> ZINCRBY ranking:restaurants 1 "Red Lobster" 
+"46"
+
+127.0.0.1:6379> ZREVRANK ranking:restaurants "Olive Garden" 
+(integer) 0 
+ 
+127.0.0.1:6379> ZSCORE ranking:restaurants  "Olive Garden" 
+"100"
+
+
+
+127.0.0.1:6379> ZADD ranking2:restaurants 50 "Olive Garden" 33 "PF Chang's" 55 "Outback Steakhouse" 190 "Kung Pao House" 
+(integer) 4 
+ 
+127.0.0.1:6379> ZUNIONSTORE totalranking 2 ranking:restaurants ranking2:restaurants WEIGHTS 1 2 
+(integer) 6 
+ 
+ 
+127.0.0.1:6379> ZREVRANGE totalranking 0 -1 WITHSCORES 
+ 1) "Kung Pao House" 
+ 2) "380" 
+ 3) "Olive Garden" 
+ 4) "200" 
+ 5) "Outback Steakhouse" 
+ 6) "144" 
+ 7) "PF Chang's" 
+ 8) "89" 
+ 9) "Longhorn Steakhouse" 
+10) "88" 
+11) "Red Lobster" 
+12) "46" 
+
+
+127.0.0.1:6379> ZADD ranking:restaurants NX 50 "Olive Garden" 
+(integer) 0 
+ 
+127.0.0.1:6379> ZREVRANGE ranking:restaurants 0 -1 WITHSCORES 
+ 1) "Kung Pao House" 
+ 2) "213" 
+ 3) "Olive Garden" 
+ 4) "100" 
+ 5) "Longhorn Steakhouse" 
+ 6) "88" 
+ 7) "Red Lobster" 
+ 8) "46" 
+ 9) "Outback Steakhouse" 
+10) "34" 
+11) "PF Chang's" 
+12) "23"
+
+
+127.0.0.1:6379> ZREVRANGE totalranking 0 2 WITHSCORES 
+1) "Kung Pao House" 
+2) "380" 
+3) "Olive Garden"
+
+
+--------------------------------------------------------------
+Using the HyperLogLog data type
+--------------------------------------------------------------
+
+
+127.0.0.1:6379> PFADD "Counting:Olive Garden" "0000123" 
+(integer) 1 
+ 
+127.0.0.1:6379> PFADD "Counting:Olive Garden" "0023992" 
+(integer) 1
+
+127.0.0.1:6379> PFCOUNT "Counting:Olive Garden" 
+(integer) 2
+
+
+
+127.0.0.1:6379> PFADD "Counting:Olive Garden:20170903" "0023992" "0023991" "0045992" 
+(integer) 1 
+127.0.0.1:6379> PFADD "Counting:Olive Garden:20170904" "0023992" "0023991" "0045992" 
+(integer) 1 
+127.0.0.1:6379> PFADD "Counting:Olive Garden:20170905" "0024492" "0023211" "0045292" 
+(integer) 1 
+127.0.0.1:6379> PFADD "Counting:Olive Garden:20170906" "0023999" "0063991" "0045922" 
+(integer) 1 
+127.0.0.1:6379> PFADD "Counting:Olive Garden:20170907" "0023292" "0023991" "0045921" 
+(integer) 1 
+127.0.0.1:6379> PFADD "Counting:Olive Garden:20170908" "0043282" "0023984" "0045092" 
+(integer) 1 
+127.0.0.1:6379> PFADD "Counting:Olive Garden:20170909" "0023992" "0023991" "0045992" 
+(integer) 1 
+ 
+
+127.0.0.1:6379> PFMERGE "Counting:Olive Garden:20170903week" "Counting:Olive Garden:20170903" "Counting:Olive Garden:20170904" "Counting:Olive Garden:20170905" "Counting:Olive Garden:20170906" "Counting:Olive Garden:20170907" "Counting:Olive Garden:20170908" "Counting:Olive Garden:20170909" 
+OK 
+ 
+127.0.0.1:6379> PFCOUNT "Counting:Olive Garden:20170903week" 
+(integer) 14
+
+
+
+------------------------------------------------------------------------------
+Using the Geo data type
+------------------------------------------------------------------------------
+
+
+127.0.0.1:6379> GEOADD restaurants:CA -121.896321 37.916750 "Olive Garden" -117.910937 33.804047 "P.F. Chang's" -118.508020 34.453276 "Outback Steakhouse" -119.152439 34.264558 "Red Lobster" -122.276909 39.458300 "Longhorn Charcoal Pit" 
+(integer) 5
+
+127.0.0.1:6379> GEOPOS restaurants:CA "Red Lobster" 
+1) 1) "-119.1524389386177063" 
+   2) "34.26455707283378871" 
+
+127.0.0.1:6379> GEORADIUS  restaurants:CA  -121.923170 37.878506 5 km 
+1) "Olive Garden" 
+    
+
+127.0.0.1:6379> GEODIST restaurants:CA "P.F. Chang's" "Outback Steakhouse" km 
+"90.7557"    
+
+127.0.0.1:6379> GEORADIUSBYMEMBER restaurants:CA "Outback Steakhouse" 100 km 
+1) "Red Lobster" 
+2) "Outback Steakhouse" 
+3) "P.F. Chang's"
+
+
+
+
+--------------------------------------------------------------------------
+

@@ -1,0 +1,38 @@
+
+
+
+set bank1 1000
+set bank2 2000
+multi
+incrby bank1 100
+incrby bank2 100
+discard
+exec
+get bank1
+
+
+
+multi
+incrby bank1 100
+exec
+
+
+watch bank1
+multi
+incrby 100
+exec
+
+
+whatch bank1
+incrby bank1 100
+multi
+incrby bank1 100
+exec
+
+
+2nd terminal
+
+
+
+
+unwatch
